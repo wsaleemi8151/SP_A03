@@ -1,0 +1,25 @@
+#
+# this makefile will compile and link the "shared producer" server
+# application
+# 
+# =======================================================
+#                  Shared Memory Example Server
+# =======================================================
+# FINAL BINARY Target
+./bin/producer : ./obj/producer.o
+	cc ./obj/producer.o -o ./bin/producer
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/producer.o : ./src/producer.c
+	cc -c ./src/producer.c -o ./obj/producer.o
+
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/producer*
+	rm -f ./obj/producer.*
+	rm -f ./src/producer.c~

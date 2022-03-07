@@ -1,0 +1,24 @@
+#
+# this makefile will compile and link the semaphore2 application
+# 
+# =======================================================
+#                  Semaphore User 2
+# =======================================================
+# FINAL BINARY Target
+./bin/semaphore2 : ./obj/semaphoreUser2.o
+	cc ./obj/semaphoreUser2.o -o ./bin/semaphore2
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/semaphoreUser2.o : ./src/semaphoreUser2.c ./inc/semaphoreStruct.h
+	cc -c ./src/semaphoreUser2.c -o ./obj/semaphoreUser2.o
+
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/semaphore2*
+	rm -f ./obj/semaphoreUser2.*
+	rm -f ./src/semaphoreUser2.c~

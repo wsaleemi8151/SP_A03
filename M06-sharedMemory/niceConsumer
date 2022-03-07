@@ -1,0 +1,25 @@
+#
+# this makefile will compile and link the "nice consumer" client
+# application
+# 
+# =======================================================
+#                  Shared Memory Example 2
+# =======================================================
+# FINAL BINARY Target
+./bin/niceConsumer : ./obj/niceConsumer.o
+	cc ./obj/niceConsumer.o -o ./bin/niceConsumer
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/niceConsumer.o : ./src/niceConsumer.c
+	cc -c ./src/niceConsumer.c -o ./obj/niceConsumer.o
+
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/niceConsumer*
+	rm -f ./obj/niceConsumer.*
+	rm -f ./src/niceConsumer.c~

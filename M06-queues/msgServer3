@@ -1,0 +1,25 @@
+#
+# this makefile will compile and link the "msgServer3"
+# application
+# 
+# =======================================================
+#                  Server Example 3
+# =======================================================
+# FINAL BINARY Target
+./bin/msgServer3 : ./obj/message_server_3.o
+	cc ./obj/message_server_3.o -o ./bin/msgServer3
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/message_server_3.o : ./src/message_server_3.c ./inc/message_struct_3.h
+	cc -c ./src/message_server_3.c -o ./obj/message_server_3.o
+
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/msgServer3*
+	rm -f ./obj/message_server_3.*
+	rm -f ./src/message_server_3.c~

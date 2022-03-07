@@ -1,0 +1,24 @@
+#
+# this makefile will compile and link the "msgClient3"
+# application
+# 
+# =======================================================
+#                  Client Example 3
+# =======================================================
+# FINAL BINARY Target
+./bin/msgClient3 : ./obj/message_client_3.o
+	cc ./obj/message_client_3.o -o ./bin/msgClient3
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/message_client_3.o : ./src/message_client_3.c ./inc/message_struct_3.h
+	cc -c ./src/message_client_3.c -o ./obj/message_client_3.o
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/msgClient3*
+	rm -f ./obj/message_client_3.*
+	rm -f ./src/message_client_3.c~

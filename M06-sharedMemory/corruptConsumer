@@ -1,0 +1,25 @@
+#
+# this makefile will compile and link the "corrupt consumer" client
+# application
+# 
+# =======================================================
+#                  Shared Memory Example 1
+# =======================================================
+# FINAL BINARY Target
+./bin/corruptConsumer : ./obj/corruptConsumer.o
+	cc ./obj/corruptConsumer.o -o ./bin/corruptConsumer
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/corruptConsumer.o : ./src/corruptConsumer.c
+	cc -c ./src/corruptConsumer.c -o ./obj/corruptConsumer.o
+
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/corruptConsumer*
+	rm -f ./obj/corruptConsumer.*
+	rm -f ./src/corruptConsumer.c~

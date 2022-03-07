@@ -1,0 +1,24 @@
+#
+# this makefile will compile and link the semaphore1 application
+# 
+# =======================================================
+#                  Semaphore User 1
+# =======================================================
+# FINAL BINARY Target
+./bin/semaphore1 : ./obj/semaphoreUser1.o
+	cc ./obj/semaphoreUser1.o -o ./bin/semaphore1
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/semaphoreUser1.o : ./src/semaphoreUser1.c ./inc/semaphoreStruct.h
+	cc -c ./src/semaphoreUser1.c -o ./obj/semaphoreUser1.o
+
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/semaphore1*
+	rm -f ./obj/semaphoreUser1.*
+	rm -f ./src/semaphoreUser1.c~

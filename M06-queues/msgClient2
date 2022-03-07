@@ -1,0 +1,24 @@
+#
+# this makefile will compile and link the "msgClient2"
+# application
+# 
+# =======================================================
+#                  Client Example 2
+# =======================================================
+# FINAL BINARY Target
+./bin/msgClient2 : ./obj/message_client_2.o
+	cc ./obj/message_client_2.o -o ./bin/msgClient2
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/message_client_2.o : ./src/message_client_2.c ./inc/message_struct_2.h
+	cc -c ./src/message_client_2.c -o ./obj/message_client_2.o
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/msgClient2*
+	rm -f ./obj/message_client_2.*
+	rm -f ./src/message_client_2.c~

@@ -1,0 +1,25 @@
+#
+# this makefile will compile and link the "msgServer2"
+# application
+# 
+# =======================================================
+#                  Server Example 2
+# =======================================================
+# FINAL BINARY Target
+./bin/msgServer2 : ./obj/message_server_2.o
+	cc ./obj/message_server_2.o -o ./bin/msgServer2
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/message_server_2.o : ./src/message_server_2.c ./inc/message_struct_2.h
+	cc -c ./src/message_server_2.c -o ./obj/message_server_2.o
+
+#
+# =======================================================
+# Other targets
+# =======================================================                     
+clean:
+	rm -f ./bin/msgServer2*
+	rm -f ./obj/message_server_2.*
+	rm -f ./src/message_server_2.c~
