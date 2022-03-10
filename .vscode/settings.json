@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "stdlib.h": "c",
+        "message_struct_3.h": "c",
+        "logger.h": "c",
+        "stdio.h": "c"
+    }
+}

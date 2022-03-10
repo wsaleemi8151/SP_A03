@@ -1,0 +1,33 @@
+#
+# this makefile will compile and link the "Data Reader" application
+# 
+# =======================================================
+#                  Data Reader
+# =======================================================
+# FINAL BINARY Target
+./bin/dataReader : ./obj/data_reader.o ./obj/logger.o ./obj/message_queues.o
+	cc ./obj/data_reader.o ./obj/logger.o ./obj/message_queues.o -o ./bin/dataReader
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+./obj/data_reader.o : ./src/data_reader.c ./inc/data_reader.h 
+	cc -c ./src/data_reader.c -o ./obj/data_reader.o
+	                
+./obj/logger.o : ../Common/src/logger.c ../Common/inc/logger.h 
+	cc -c ../Common/src/logger.c -o ./obj/logger.o
+
+./obj/message_queues.o : ../Common/src/message_queues.c ../Common/inc/message_queues.h 
+	cc -c ../Common/src/message_queues.c -o ./obj/message_queues.o
+
+#
+# =======================================================
+# Other targets
+# ======================================================= 
+all: ./bin/dataReader
+
+clean: 
+	rm -f ./bin/dataReader*
+	rm -f ./obj/data_Reader.*
+	rm -f ./obj/logger.*
+	rm -f ./obj/message_queues.*
