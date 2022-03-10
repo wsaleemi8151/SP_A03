@@ -3,6 +3,8 @@
         "stdlib.h": "c",
         "message_struct_3.h": "c",
         "logger.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "time.h": "c",
+        "message_queues.h": "c"
     }
 }

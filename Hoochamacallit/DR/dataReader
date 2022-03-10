@@ -5,29 +5,33 @@
 #                  Data Reader
 # =======================================================
 # FINAL BINARY Target
-./bin/dataReader : ./obj/data_reader.o ./obj/logger.o ./obj/message_queues.o
-	cc ./obj/data_reader.o ./obj/logger.o ./obj/message_queues.o -o ./bin/dataReader
+../Common/bin/dataReader : ../Common/obj/data_reader.o ../Common/obj/logger.o ../Common/obj/message_queues.o ../Common/obj/shared_memory.o
+	cc ../Common/obj/data_reader.o ../Common/obj/logger.o ../Common/obj/message_queues.o ../Common/obj/shared_memory.o -o ../Common/bin/dataReader
 #
 # =======================================================
 #                     Dependencies
 # =======================================================                     
-./obj/data_reader.o : ./src/data_reader.c ./inc/data_reader.h 
-	cc -c ./src/data_reader.c -o ./obj/data_reader.o
+../Common/obj/data_reader.o : ./src/data_reader.c ./inc/data_reader.h ../Common/inc/common.h
+	cc -c ./src/data_reader.c -o ../Common/obj/data_reader.o
 	                
-./obj/logger.o : ../Common/src/logger.c ../Common/inc/logger.h 
-	cc -c ../Common/src/logger.c -o ./obj/logger.o
+../Common/obj/logger.o : ../Common/src/logger.c ../Common/inc/logger.h 
+	cc -c ../Common/src/logger.c -o ../Common/obj/logger.o
 
-./obj/message_queues.o : ../Common/src/message_queues.c ../Common/inc/message_queues.h 
-	cc -c ../Common/src/message_queues.c -o ./obj/message_queues.o
+../Common/obj/message_queues.o : ../Common/src/message_queues.c ../Common/inc/message_queues.h 
+	cc -c ../Common/src/message_queues.c -o ../Common/obj/message_queues.o
+
+../Common/obj/shared_memory.o : ../Common/src/shared_memory.c ../Common/inc/shared_memory.h 
+	cc -c ../Common/src/shared_memory.c -o ../Common/obj/shared_memory.o
 
 #
 # =======================================================
 # Other targets
 # ======================================================= 
-all: ./bin/dataReader
+all: ../Common/bin/dataReader
 
 clean: 
-	rm -f ./bin/dataReader*
-	rm -f ./obj/data_Reader.*
-	rm -f ./obj/logger.*
-	rm -f ./obj/message_queues.*
+	rm -f ../Common/bin/dataReader*
+	rm -f ../Common/obj/data_Reader.*
+	rm -f ../Common/obj/logger.*
+	rm -f ../Common/obj/message_queues.*
+	rm -f ../Common/obj/shared_memory.*

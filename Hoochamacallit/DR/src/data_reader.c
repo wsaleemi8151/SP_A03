@@ -9,6 +9,7 @@
 #include "../inc/data_reader.h"
 #include "../../Common/inc/message_queues.h"
 #include "../../Common/inc/logger.h"
+#include "../../Common/inc/common.h"
 
 int main (void)
 {
@@ -22,15 +23,20 @@ int LaunchDataReader(void)
 	int 		mid; // message ID
 	int 		exitServer = FALSE;
 
-	/* data creator PID will be used in message queues */
+	/* data reader PID will be used in message queues */
 	myPID = getpid();
 
-	message_key = ftok (".", 4578);
+	message_key = ftok (".", 'K');
     if (message_key == -1) 
 	{ 
-	  LogMessage(data_reader,"(Data Creator) Cannot allocate key\n");
+	  LogMessage(data_reader,"(Data Reader) Cannot allocate key\n");
 	  return 1;
 	}	/* endif */
+
+
+    char message[200] = "";
+    sprintf(message, "(Data Reader) Checking for message queue ...with ID %d\n", message_key);
+	LogMessage(data_reader, message);
 
     if ((mid = msgget (message_key, 0)) == -1) 
 	{
@@ -47,7 +53,7 @@ int LaunchDataReader(void)
 			return 2;
 		}
 	}
-    char message[200] = "";
+    
     sprintf(message, "(Data Reader) Our message queue ID is %d\n", mid);
 	LogMessage(data_reader, message);
 

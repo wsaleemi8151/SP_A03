@@ -5,30 +5,30 @@
 #                  Data Creator
 # =======================================================
 # FINAL BINARY Target
-./bin/dataCreator : ./obj/data_creator.o ./obj/logger.o ./obj/message_queues.o
-	cc ./obj/data_creator.o ./obj/logger.o ./obj/message_queues.o -o ./bin/dataCreator
+../Common/bin/dataCreator : ../Common/obj/data_creator.o ../Common/obj/logger.o ../Common/obj/message_queues.o
+	cc ../Common/obj/data_creator.o ../Common/obj/logger.o ../Common/obj/message_queues.o -o ../Common/bin/dataCreator
 #
 # =======================================================
 #                     Dependencies
 # =======================================================                     
-./obj/data_creator.o : ./src/data_creator.c ./inc/data_creator.h 
-	cc -c ./src/data_creator.c -o ./obj/data_creator.o
+../Common/obj/data_creator.o : ./src/data_creator.c ./inc/data_creator.h ../Common/inc/common.h 
+	cc -c ./src/data_creator.c -o ../Common/obj/data_creator.o
 	                
-./obj/logger.o : ../Common/src/logger.c ../Common/inc/logger.h 
-	cc -c ../Common/src/logger.c -o ./obj/logger.o
+../Common/obj/logger.o : ../Common/src/logger.c ../Common/inc/logger.h 
+	cc -c ../Common/src/logger.c -o ../Common/obj/logger.o
 
-./obj/message_queues.o : ../Common/src/message_queues.c ../Common/inc/message_queues.h 
-	cc -c ../Common/src/message_queues.c -o ./obj/message_queues.o
+../Common/obj/message_queues.o : ../Common/src/message_queues.c ../Common/inc/message_queues.h 
+	cc -c ../Common/src/message_queues.c -o ../Common/obj/message_queues.o
 
 #
 # =======================================================
 # Other targets
 # ======================================================= 
-all: ./bin/dataCreator
+all: ../Common/bin/dataCreator
 
 clean: 
-	rm -f ./bin/dataCreator*
-	rm -f ./obj/data_creator.*
-	rm -f ./obj/logger.*
-	rm -f ./obj/message_queues.*
+	rm -f ../Common/bin/dataCreator*
+	rm -f ../Common/obj/data_creator.*
+	rm -f ../Common/obj/logger.*
+	rm -f ../Common/obj/message_queues.*
 
