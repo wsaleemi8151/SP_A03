@@ -32,7 +32,8 @@ int LaunchDataReader(void)
 	/* data reader PID will be used in message queues */
 	myPID = getpid();
 
-	message_key = ftok (".", 'K');
+    // used /temp folder to get the same message key for data reader and data creator
+	message_key = ftok ("/tmp", MESSAGE_QUEUE_KEY_ID);
     if (message_key == -1) 
 	{ 
 	  LogMessage(data_reader,"(Data Reader) Cannot allocate key\n");

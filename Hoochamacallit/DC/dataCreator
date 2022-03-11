@@ -5,14 +5,14 @@
 #                  Data Creator
 # =======================================================
 # FINAL BINARY Target
-../Common/bin/dataCreator : ../Common/obj/data_creator.o ../Common/obj/logger.o ../Common/obj/message_queues.o
-	cc ../Common/obj/data_creator.o ../Common/obj/logger.o ../Common/obj/message_queues.o -o ../Common/bin/dataCreator
+./bin/dataCreator : ./obj/data_creator.o ../Common/obj/logger.o ../Common/obj/message_queues.o
+	cc ./obj/data_creator.o ../Common/obj/logger.o ../Common/obj/message_queues.o -o ./bin/dataCreator
 #
 # =======================================================
 #                     Dependencies
 # =======================================================                     
-../Common/obj/data_creator.o : ./src/data_creator.c ./inc/data_creator.h ../Common/inc/common.h 
-	cc -c ./src/data_creator.c -o ../Common/obj/data_creator.o
+./obj/data_creator.o : ./src/data_creator.c ./inc/data_creator.h ../Common/inc/common.h 
+	cc -c ./src/data_creator.c -o ./obj/data_creator.o
 	                
 ../Common/obj/logger.o : ../Common/src/logger.c ../Common/inc/logger.h 
 	cc -c ../Common/src/logger.c -o ../Common/obj/logger.o
@@ -24,11 +24,11 @@
 # =======================================================
 # Other targets
 # ======================================================= 
-all: ../Common/bin/dataCreator
+all: ./bin/dataCreator
 
 clean: 
-	rm -f ../Common/bin/dataCreator*
-	rm -f ../Common/obj/data_creator.*
+	rm -f ./bin/dataCreator*
+	rm -f ./obj/data_creator.*
 	rm -f ../Common/obj/logger.*
 	rm -f ../Common/obj/message_queues.*
 

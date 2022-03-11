@@ -5,14 +5,14 @@
 #                  Data Reader
 # =======================================================
 # FINAL BINARY Target
-../Common/bin/dataReader : ../Common/obj/data_reader.o ../Common/obj/logger.o ../Common/obj/message_queues.o ../Common/obj/shared_memory.o
-	cc ../Common/obj/data_reader.o ../Common/obj/logger.o ../Common/obj/message_queues.o ../Common/obj/shared_memory.o -o ../Common/bin/dataReader
+./bin/dataReader : ./obj/data_reader.o ../Common/obj/logger.o ../Common/obj/message_queues.o ../Common/obj/shared_memory.o
+	cc ./obj/data_reader.o ../Common/obj/logger.o ../Common/obj/message_queues.o ../Common/obj/shared_memory.o -o ./bin/dataReader
 #
 # =======================================================
 #                     Dependencies
 # =======================================================                     
-../Common/obj/data_reader.o : ./src/data_reader.c ./inc/data_reader.h ../Common/inc/common.h
-	cc -c ./src/data_reader.c -o ../Common/obj/data_reader.o
+./obj/data_reader.o : ./src/data_reader.c ./inc/data_reader.h ../Common/inc/common.h
+	cc -c ./src/data_reader.c -o ./obj/data_reader.o
 	                
 ../Common/obj/logger.o : ../Common/src/logger.c ../Common/inc/logger.h 
 	cc -c ../Common/src/logger.c -o ../Common/obj/logger.o
@@ -27,11 +27,11 @@
 # =======================================================
 # Other targets
 # ======================================================= 
-all: ../Common/bin/dataReader
+all: ./bin/dataReader
 
 clean: 
-	rm -f ../Common/bin/dataReader*
-	rm -f ../Common/obj/data_Reader.*
+	rm -f ./bin/dataReader*
+	rm -f ./obj/data_Reader.*
 	rm -f ../Common/obj/logger.*
 	rm -f ../Common/obj/message_queues.*
 	rm -f ../Common/obj/shared_memory.*
