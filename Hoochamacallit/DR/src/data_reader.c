@@ -18,10 +18,16 @@ int main (void)
 
 int LaunchDataReader(void)
 {
+    char logMsg[200] = "";
+
 	key_t	 	message_key;
 	pid_t		myPID;
 	int 		mid; // message ID
-	int 		exitServer = FALSE;
+	int 		exitDataReader = FALSE;
+
+	int 		rc;	// return code from message processing
+	char		buffer[100];
+	MSGENVELOPE 	msg;
 
 	/* data reader PID will be used in message queues */
 	myPID = getpid();
@@ -34,16 +40,13 @@ int LaunchDataReader(void)
 	}	/* endif */
 
 
-    char message[200] = "";
-    sprintf(message, "(Data Reader) Checking for message queue ...with ID %d\n", message_key);
-	LogMessage(data_reader, message);
 
     if ((mid = msgget (message_key, 0)) == -1) 
 	{
 		LogMessage(data_reader, "(Data Reader) No queue available, create!\n");
 
 		/*
-		 * nope, let's create one (user/group read/write perms)
+		 * create one message queue (user/group read/write perms)
 		 */
 
 		mid = msgget (message_key, IPC_CREAT | 0660);
@@ -54,11 +57,24 @@ int LaunchDataReader(void)
 		}
 	}
     
-    sprintf(message, "(Data Reader) Our message queue ID is %d\n", mid);
-	LogMessage(data_reader, message);
+    sprintf(logMsg, "(Data Reader) Message queue ID is %d\n", mid);
+	LogMessage(data_reader, logMsg);
 
-    while(! exitServer)
+    // waiting for 15 seconds to let Data Creators create messages
+    sleep(30);
+
+    while(! exitDataReader)
 	{
-        sleep(30);
+        rc = msgrcv (mid, (void *)&msg, sizeof (MSGCONTENT), 0, 0); // set type = 0 to get mesgs in FIFO
+		if (rc == -1) break;
+
+        sprintf(logMsg, "(Data Creator) Message Sent with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
+        LogMessage(data_creator, logMsg);
+
+        sleep(1.5);
     }
+
+    LogMessage(data_reader, "(Data Reader) Exiting ... removing msgQ and leaving ...\n");
+	msgctl (mid, IPC_RMID, (struct msqid_ds *)NULL);
+    return 1;
 }

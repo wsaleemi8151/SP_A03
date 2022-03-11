@@ -19,6 +19,8 @@ int main (void)
 
 int LaunchDataCreator(void)
 {
+    char logMsg[200] = "";
+
 	key_t	 	    message_key;
 	pid_t		    myPID;
 	int 		    mid; // message ID
@@ -44,10 +46,6 @@ int LaunchDataCreator(void)
      * and keep in this loop until it found message queue
 	 */
 
-    char message[200] = "";
-    sprintf(message, "(Data Creator) Checking for message queue ...with ID %d\n", message_key);
-	LogMessage(data_creator, message);
-
 	while ((mid = msgget (message_key, 0)) == -1) 
 	{
 		/*
@@ -59,8 +57,8 @@ int LaunchDataCreator(void)
 
     // reach here if data creator found the message queue
     
-    sprintf(message, "(Data Creator) Our message queue ID is %d\n", mid);
-	LogMessage(data_creator, message);
+    sprintf(logMsg, "(Data Creator) Message queue ID is %d\n", mid);
+	LogMessage(data_creator, logMsg);
 
     msg.type = EVERYTHING_OKAY;
     msg.data.dcProcessID = myPID;
@@ -73,11 +71,6 @@ int LaunchDataCreator(void)
         msg.data.timeStamp = time(NULL);
         msg.data.dcProcessID = myPID;
 
-        if(msg.type == MACHINE_OFFLINE)
-        {
-            exitDataCreator = TRUE;
-        }
-
         rc = msgsnd (mid, (void *)&msg, sizeof (MSGCONTENT), 0);
         if (rc == -1) 
         {
@@ -85,9 +78,20 @@ int LaunchDataCreator(void)
             return 4;
         }
         
-        sprintf(message, "(Data Creator) Message Sent with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
-        LogMessage(data_creator, message);
-        sleep (10);
+        sprintf(logMsg, "(Data Creator) Message Sent with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
+        LogMessage(data_creator, logMsg);
+
+        if(msg.type == MACHINE_OFFLINE)
+        {
+            exitDataCreator = TRUE;
+        } else
+        {
+            // The %21, gives you a number between 0 and 20. Adding 10, gives you a number between 10 and 30.
+            // Reference: https://stackoverflow.com/questions/17909215/c-random-numbers-between-10-and-30
+            int interval = (rand() % 21) + 10;
+            sleep (interval);
+        }
+
     }
 
     // data creator is done and exiting
