@@ -20,6 +20,7 @@ int main(void)
 int LaunchDataCreator(void)
 {
     char logMsg[200] = "";
+    int isFirstTime = TRUE;
 
     key_t message_key;
     pid_t myPID;
@@ -36,7 +37,7 @@ int LaunchDataCreator(void)
     message_key = ftok("/tmp", MESSAGE_QUEUE_KEY_ID);
     if (message_key == -1)
     {
-        LogMessage(data_creator, "(Data Creator) Cannot allocate key\n");
+        LogMessage(data_creator, "Cannot allocate key\n");
         return 1;
     } /* endif */
 
@@ -51,34 +52,58 @@ int LaunchDataCreator(void)
         /*
          * not available yet ... check in 10 seconds
          */
-        LogMessage(data_creator, "(Data Creator) Queue not available ... sleeping for 10 seconds ...\n");
+        LogMessage(data_creator, "Queue not available ... sleeping for 10 seconds ...\n");
         sleep(10);
     } /* end while */
 
     // reach here if data creator found the message queue
 
-    sprintf(logMsg, "(Data Creator) Message queue ID is %d\n", mid);
+    sprintf(logMsg, "Message queue ID is %d\n", mid);
     LogMessage(data_creator, logMsg);
-
-    msg.type = EVERYTHING_OKAY;
-    msg.data.dcProcessID = myPID;
-    msg.data.timeStamp = time(NULL);
 
     while (!exitDataCreator)
     {
+
+        if (isFirstTime == TRUE)
+        {
+            time_t startTime;
+            time(&startTime);
+
+            msg.type = 7; // rand() % NUMBER_OF_STATUSES;
+            msg.data.timeStamp = startTime;
+            msg.data.dcProcessID = myPID;
+
+            rc = msgsnd(mid, (void *)&msg, sizeof(MSGCONTENT), 0);
+            if (rc == -1)
+            {
+                LogMessage(data_creator, "Send error!\n");
+                return 4;
+            }
+
+            sprintf(logMsg, "Message Sent with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
+            LogMessage(data_creator, logMsg);
+
+            isFirstTime = FALSE;
+            int interval = (rand() % 21) + 10;
+            sleep(interval);
+        }
+        
+        time_t now;
+        time(&now);
+
         // loop until shutdown status is sent to the data reader
         msg.type = rand() % NUMBER_OF_STATUSES;
-        msg.data.timeStamp = time(NULL);
+        msg.data.timeStamp = now;
         msg.data.dcProcessID = myPID;
 
         rc = msgsnd(mid, (void *)&msg, sizeof(MSGCONTENT), 0);
         if (rc == -1)
         {
-            LogMessage(data_creator, "(Data Creator) Send error!\n");
+            LogMessage(data_creator, "Send error!\n");
             return 4;
         }
 
-        sprintf(logMsg, "(Data Creator) Message Sent with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
+        sprintf(logMsg, "Message Sent with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
         LogMessage(data_creator, logMsg);
 
         if (msg.type == MACHINE_OFFLINE)

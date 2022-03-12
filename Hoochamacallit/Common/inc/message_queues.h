@@ -17,6 +17,7 @@ char *GetMessageString(long status);
 
 #define NUMBER_OF_STATUSES 7
 
+#define EVERYTHING_OKAY_ON_START 7					 // 0 : means Everything is OKAY
 #define EVERYTHING_OKAY 0					 // 0 : means Everything is OKAY
 #define HYDRAULIC_PRESSURE_FAILURE 1		 // 1 : means Hydraulic Pressure Failure
 #define SAFETY_BUTTON_FAILURE 2				 // 2 : means Safety Button Failure

@@ -6,3 +6,5 @@
 
 int LaunchDataReader(void);
 int GetMachineIndex(MasterList *lstMaster, pid_t dcProcessID);
+int CheckIsMachineAnyMachineInactive(MasterList *lstMaster);
+int CheckIsMachineAnyMachineInactive(MasterList *lstMaster);

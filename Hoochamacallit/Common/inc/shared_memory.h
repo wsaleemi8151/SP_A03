@@ -2,6 +2,7 @@
 #include <time.h>
 
 #define MAX_DC_ROLES 10
+#define MAX_DC_RESPONSE_INTERVAL 35
 
 typedef struct
 {

@@ -40,13 +40,13 @@ int LaunchDataReader(void)
 	message_key = ftok("/tmp", MESSAGE_QUEUE_KEY_ID);
 	if (message_key == -1)
 	{
-		LogMessage(data_reader, "(Data Reader) Cannot allocate key\n");
+		LogMessage(data_reader, "Cannot allocate key\n");
 		return 1;
 	} /* endif */
 
 	if ((mid = msgget(message_key, 0)) == -1)
 	{
-		LogMessage(data_reader, "(Data Reader) No queue available, create!\n");
+		LogMessage(data_reader, "No queue available, create!\n");
 
 		/*
 		 * create one message queue (user/group read/write perms)
@@ -55,12 +55,12 @@ int LaunchDataReader(void)
 		mid = msgget(message_key, IPC_CREAT | 0660);
 		if (mid == -1)
 		{
-			LogMessage(data_reader, "(Data Reader) Cannot allocate a new queue!\n");
+			LogMessage(data_reader, "Cannot allocate a new queue!\n");
 			return 2;
 		}
 	}
 
-	sprintf(logMsg, "(Data Reader) Message queue ID is %d\n", mid);
+	sprintf(logMsg, "Message queue ID is %d\n", mid);
 	LogMessage(data_reader, logMsg);
 
 	// -------------------------------------------------------------------------
@@ -70,7 +70,7 @@ int LaunchDataReader(void)
 	shmem_key = ftok(".", SHARED_MEMORY_KEY_ID);
 	if (shmem_key == -1)
 	{
-		printf("(Data Reader) Cannot allocate key\n");
+		LogMessage(data_reader, "Cannot allocate key\n");
 		return 1;
 	}
 
@@ -85,16 +85,17 @@ int LaunchDataReader(void)
 		 * nope, let's create one (user/group read/write perms)
 		 */
 
-		printf("(Data Reader) No Shared-Memory currently available - so create!\n");
+		LogMessage(data_reader, "No Shared-Memory currently available - so create!\n");
 		shmid = shmget(shmem_key, sizeof(MasterList), IPC_CREAT | 0660);
 		if (shmid == -1)
 		{
-			printf("(Data Reader) Cannot allocate a new memory!\n");
+			LogMessage(data_reader, "Cannot allocate a new memory!\n");
 			return 2;
 		}
 	}
 
-	printf("(Data Reader) Our Shared-Memory ID is %d\n", shmid);
+	sprintf(logMsg, "Our Shared-Memory ID is %d\n", shmid);
+	LogMessage(data_reader, logMsg);
 
 	/* now allow the Data Reader (server) to attach to our shared memory and begin
 	   producing data to be read ... */
@@ -102,7 +103,7 @@ int LaunchDataReader(void)
 	lstMaster = (MasterList *)shmat(shmid, NULL, 0);
 	if (lstMaster == NULL)
 	{
-		printf("(Data Reader) Cannot attach to shared memory!\n");
+		LogMessage(data_reader, "Cannot attach to shared memory!\n");
 		return 3;
 	}
 
@@ -118,14 +119,19 @@ int LaunchDataReader(void)
 
 	while (!exitDataReader)
 	{
+		LogMessage(data_reader, "Here------------\n\n");
+		CheckIsMachineAnyMachineInactive(lstMaster);
+
 		rc = msgrcv(mid, (void *)&msg, sizeof(MSGCONTENT), 0, 0); // set type = 0 to get mesgs in FIFO
 		if (rc == -1)
 			break;
 
-		sprintf(logMsg, "(Data Reader) Message Received with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
+		sprintf(logMsg, "Message Received with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
 		LogMessage(data_reader, logMsg);
 
-		if (msg.type == EVERYTHING_OKAY && GetMachineIndex(lstMaster, msg.data.dcProcessID) == -1)
+		int dcMachineIndex = GetMachineIndex(lstMaster, msg.data.dcProcessID);
+
+		if (msg.type == EVERYTHING_OKAY_ON_START && dcMachineIndex == -1)
 		{
 			sprintf(logMsg, "DC-%d [%d] added to the master list - NEW DC - Status %d (%s)\n", lstMaster->numberOfDCs, (int)msg.data.dcProcessID, (int)msg.type, GetMessageString(msg.type));
 			LogMessage(data_reader, logMsg);
@@ -136,33 +142,33 @@ int LaunchDataReader(void)
 		}
 		else if (msg.type == MACHINE_OFFLINE)
 		{
-			sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", GetMachineIndex(lstMaster, msg.data.dcProcessID), (int)msg.data.dcProcessID);
+			sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", dcMachineIndex, (int)msg.data.dcProcessID);
 			LogMessage(data_reader, logMsg);
 
-			lstMaster->dc[lstMaster->numberOfDCs].lastTimeHeardFrom = msg.data.timeStamp;
+			lstMaster->dc[dcMachineIndex].lastTimeHeardFrom = msg.data.timeStamp;
 		}
 		else
 		{
-			sprintf(logMsg, "DC-%d [%d] updated in the master list - MSG RECEIVED - Status %d (%s)\n", GetMachineIndex(lstMaster, msg.data.dcProcessID), (int)msg.data.dcProcessID, (int)msg.type, GetMessageString(msg.type));
+			sprintf(logMsg, "DC-%d [%d] updated in the master list - MSG RECEIVED - Status %d (%s)\n", dcMachineIndex, (int)msg.data.dcProcessID, (int)msg.type, GetMessageString(msg.type));
 			LogMessage(data_reader, logMsg);
 
-			lstMaster->dc[lstMaster->numberOfDCs].lastTimeHeardFrom = msg.data.timeStamp;
+			lstMaster->dc[dcMachineIndex].lastTimeHeardFrom = msg.data.timeStamp;
 		}
 
 		sleep(1.5);
 	}
 
-	LogMessage(data_reader, "(Data Reader) Exiting ... removing msgQ and leaving ...\n");
+	LogMessage(data_reader, "Exiting ... removing msgQ and leaving ...\n");
 	msgctl(mid, IPC_RMID, (struct msqid_ds *)NULL);
 
 	/*
 	 * detach and clean up our resources
 	 */
 
-	printf("(Data Reader) Detaching from Shared-Memory\n");
+	LogMessage(data_reader, "Detaching from Shared-Memory\n");
 	shmdt(lstMaster);
 
-	printf("(Data Reader) Removing the Shared-Memory resource\n");
+	LogMessage(data_reader, "Removing the Shared-Memory resource\n");
 	shmctl(shmid, IPC_RMID, 0);
 
 	return 1;
@@ -170,11 +176,36 @@ int LaunchDataReader(void)
 
 int GetMachineIndex(MasterList *lstMaster, pid_t dcProcessID)
 {
-	for (size_t i = 0; i < MAX_DC_ROLES; i++)
+	if (lstMaster->numberOfDCs > 0)
 	{
-		if (lstMaster->dc[i].dcProcessID == dcProcessID)
+		for (size_t i = 0; i < lstMaster->numberOfDCs; i++)
 		{
-			return i;
+			if (lstMaster->dc[i].dcProcessID == dcProcessID)
+			{
+				return i;
+			}
+		}
+	}
+	return -1;
+}
+
+int CheckIsMachineAnyMachineInactive(MasterList *lstMaster)
+{
+	char logMsg[200];
+	for (size_t i = 0; i < lstMaster->numberOfDCs; i++)
+	{
+		time_t now;
+		time(&now);
+
+		double diffInSeconds = difftime(now, lstMaster->dc[i].lastTimeHeardFrom);
+
+		sprintf(logMsg, "diffInSeconds is:%0.3f \n", diffInSeconds);
+		LogMessage(data_reader, logMsg);
+
+		if (diffInSeconds > MAX_DC_RESPONSE_INTERVAL)
+		{
+			sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", (int)i, (int)lstMaster->dc[i].dcProcessID);
+			LogMessage(data_reader, logMsg);
 		}
 	}
 	return -1;
