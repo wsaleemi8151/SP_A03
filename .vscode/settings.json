@@ -5,6 +5,8 @@
         "logger.h": "c",
         "stdio.h": "c",
         "time.h": "c",
-        "message_queues.h": "c"
+        "message_queues.h": "c",
+        "shared_memory.h": "c",
+        "shm.h": "c"
     }
 }
