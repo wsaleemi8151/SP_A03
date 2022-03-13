@@ -128,41 +128,8 @@ int LaunchDataReader(void)
 			break;
 		}
 
-		sprintf(logMsg, "Message Received with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
-		LogMessage(data_reader, logMsg);
-
-		int dcMachineIndex = GetMachineIndex(lstMaster, msg.data.dcProcessID);
-
-		if (msg.type == EVERYTHING_OKAY && dcMachineIndex == -1)
-		{
-			sprintf(logMsg, "DC-%d [%d] added to the master list - NEW DC - Status %d (%s)\n", lstMaster->numberOfDCs, (int)msg.data.dcProcessID, (int)msg.type, GetMessageString(msg.type));
-			LogMessage(data_reader, logMsg);
-
-			lstMaster->dc[lstMaster->numberOfDCs].dcProcessID = msg.data.dcProcessID;
-			lstMaster->dc[lstMaster->numberOfDCs].lastTimeHeardFrom = msg.data.timeStamp;
-			if (lstMaster->numberOfDCs == -1)
-			{
-				lstMaster->numberOfDCs = 1;
-			}
-			else
-			{
-				lstMaster->numberOfDCs += 1;
-			}
-		}
-		else if (msg.type == MACHINE_OFFLINE)
-		{
-			sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", dcMachineIndex, (int)msg.data.dcProcessID);
-			LogMessage(data_reader, logMsg);
-
-			lstMaster->numberOfDCs -= 1;
-		}
-		else
-		{
-			sprintf(logMsg, "DC-%d [%d] updated in the master list - MSG RECEIVED - Status %d (%s)\n", dcMachineIndex, (int)msg.data.dcProcessID, (int)msg.type, GetMessageString(msg.type));
-			LogMessage(data_reader, logMsg);
-
-			lstMaster->dc[dcMachineIndex].lastTimeHeardFrom = msg.data.timeStamp;
-		}
+		// Process msg queue mesg
+		ProcessMessage(&msg, lstMaster);
 
 		// checking if any DC machine is not responding
 		Check_DC_Machines_Status(lstMaster);
@@ -189,6 +156,47 @@ int LaunchDataReader(void)
 	shmctl(shmid, IPC_RMID, 0);
 
 	return 1;
+}
+
+void ProcessMessage(MSGENVELOPE *msg, MasterList *lstMaster)
+{
+	char logMsg[200];
+
+	sprintf(logMsg, "Message Received with status code: %d - %s\n", (int)msg->type, GetMessageString(msg->type));
+	LogMessage(data_reader, logMsg);
+
+	int dcMachineIndex = GetMachineIndex(lstMaster, msg->data.dcProcessID);
+
+	if (msg->type == EVERYTHING_OKAY && dcMachineIndex == -1)
+	{
+		sprintf(logMsg, "DC-%d [%d] added to the master list - NEW DC - Status %d (%s)\n", lstMaster->numberOfDCs, (int)msg->data.dcProcessID, (int)msg->type, GetMessageString(msg->type));
+		LogMessage(data_reader, logMsg);
+
+		lstMaster->dc[lstMaster->numberOfDCs].dcProcessID = msg->data.dcProcessID;
+		lstMaster->dc[lstMaster->numberOfDCs].lastTimeHeardFrom = msg->data.timeStamp;
+		if (lstMaster->numberOfDCs == -1)
+		{
+			lstMaster->numberOfDCs = 1;
+		}
+		else
+		{
+			lstMaster->numberOfDCs += 1;
+		}
+	}
+	else if (msg->type == MACHINE_OFFLINE)
+	{
+		sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", dcMachineIndex, (int)msg->data.dcProcessID);
+		LogMessage(data_reader, logMsg);
+
+		lstMaster->numberOfDCs -= 1;
+	}
+	else
+	{
+		sprintf(logMsg, "DC-%d [%d] updated in the master list - MSG RECEIVED - Status %d (%s)\n", dcMachineIndex, (int)msg->data.dcProcessID, (int)msg->type, GetMessageString(msg->type));
+		LogMessage(data_reader, logMsg);
+
+		lstMaster->dc[dcMachineIndex].lastTimeHeardFrom = msg->data.timeStamp;
+	}
 }
 
 int GetMachineIndex(MasterList *lstMaster, pid_t dcProcessID)
