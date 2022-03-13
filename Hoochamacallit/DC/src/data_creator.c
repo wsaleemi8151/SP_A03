@@ -17,6 +17,10 @@ int main(void)
     return LaunchDataCreator();
 }
 
+// srand help retrieved from:
+// https://www.geeksforgeeks.org/rand-and-srand-in-ccpp/
+// srand(time(0));
+
 int LaunchDataCreator(void)
 {
     char logMsg[200] = "";
@@ -69,7 +73,7 @@ int LaunchDataCreator(void)
             time_t startTime;
             time(&startTime);
 
-            msg.type = 7; // rand() % NUMBER_OF_STATUSES;
+            msg.type = EVERYTHING_OKAY;
             msg.data.timeStamp = startTime;
             msg.data.dcProcessID = myPID;
 
@@ -84,6 +88,7 @@ int LaunchDataCreator(void)
             LogMessage(data_creator, logMsg);
 
             isFirstTime = FALSE;
+            srand(time(0)); // set new seed for rand()
             int interval = (rand() % 21) + 10;
             sleep(interval);
         }
@@ -93,9 +98,18 @@ int LaunchDataCreator(void)
 
         // loop until shutdown status is sent to the data reader
         // as we are sending mesg in msg type, so type 0 causes error
+        srand(time(0)); // set new seed for rand()
         msg.type = (rand() % NUMBER_OF_STATUSES) + 1;
         msg.data.timeStamp = now;
         msg.data.dcProcessID = myPID;
+
+        // if for some reasons, message queue is deleted,
+        // DC will exit after logging the issue
+        if ((mid = msgget(message_key, 0)) == -1)
+        {
+            LogMessage(data_creator, "Queue is unavailable ... exiting DC machine ...\n");
+            break;
+        }
 
         rc = msgsnd(mid, (void *)&msg, sizeof(MSGCONTENT), 0);
         if (rc == -1)
@@ -119,6 +133,7 @@ int LaunchDataCreator(void)
         {
             // The %21, gives you a number between 0 and 20. Adding 10, gives you a number between 10 and 30.
             // Reference: https://stackoverflow.com/questions/17909215/c-random-numbers-between-10-and-30
+            srand(time(0)); // set new seed for rand()
             int interval = (rand() % 21) + 10;
             sleep(interval);
         }

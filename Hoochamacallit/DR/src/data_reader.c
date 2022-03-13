@@ -80,7 +80,6 @@ int LaunchDataReader(void)
 
 	if ((shmid = shmget(shmem_key, sizeof(MasterList), 0)) == -1)
 	{
-
 		/*
 		 * nope, let's create one (user/group read/write perms)
 		 */
