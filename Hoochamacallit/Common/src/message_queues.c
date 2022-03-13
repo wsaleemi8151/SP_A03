@@ -5,10 +5,6 @@ char *GetMessageString(long status)
 {
     switch (status)
     {
-    case EVERYTHING_OKAY_ON_START:
-        return "Everything is OKAY";
-        break;
-
     case EVERYTHING_OKAY:
         return "Everything is OKAY";
         break;

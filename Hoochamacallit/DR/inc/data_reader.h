@@ -6,4 +6,4 @@
 
 int LaunchDataReader(void);
 int GetMachineIndex(MasterList *lstMaster, pid_t dcProcessID);
-int Check_DC_Machines_Status(MasterList *lstMaster);
+void Check_DC_Machines_Status(MasterList *lstMaster);

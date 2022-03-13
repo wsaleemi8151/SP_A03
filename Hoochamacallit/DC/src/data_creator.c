@@ -87,12 +87,13 @@ int LaunchDataCreator(void)
             int interval = (rand() % 21) + 10;
             sleep(interval);
         }
-        
+
         time_t now;
         time(&now);
 
         // loop until shutdown status is sent to the data reader
-        msg.type = rand() % NUMBER_OF_STATUSES;
+        // as we are sending mesg in msg type, so type 0 causes error
+        msg.type = (rand() % NUMBER_OF_STATUSES) + 1;
         msg.data.timeStamp = now;
         msg.data.dcProcessID = myPID;
 
@@ -100,6 +101,10 @@ int LaunchDataCreator(void)
         if (rc == -1)
         {
             LogMessage(data_creator, "Send error!\n");
+
+            sprintf(logMsg, "Message Sent with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
+            LogMessage(data_creator, logMsg);
+
             return 4;
         }
 

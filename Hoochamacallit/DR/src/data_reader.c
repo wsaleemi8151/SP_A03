@@ -122,12 +122,6 @@ int LaunchDataReader(void)
 		sprintf(logMsg, "Here------------NoOfDCs: %d\n\n", lstMaster->numberOfDCs);
 		LogMessage(data_reader, logMsg);
 
-		// checking if all DC machines goes offline than exit the main loop
-		// if (Check_DC_Machines_Status(lstMaster) == 0)
-		// {
-		// 	break;
-		// }
-
 		rc = msgrcv(mid, (void *)&msg, sizeof(MSGCONTENT), 0, 0); // set type = 0 to get mesgs in FIFO
 		if (rc == -1)
 		{
@@ -139,7 +133,7 @@ int LaunchDataReader(void)
 
 		int dcMachineIndex = GetMachineIndex(lstMaster, msg.data.dcProcessID);
 
-		if (msg.type == EVERYTHING_OKAY_ON_START && dcMachineIndex == -1)
+		if (msg.type == EVERYTHING_OKAY && dcMachineIndex == -1)
 		{
 			sprintf(logMsg, "DC-%d [%d] added to the master list - NEW DC - Status %d (%s)\n", lstMaster->numberOfDCs, (int)msg.data.dcProcessID, (int)msg.type, GetMessageString(msg.type));
 			LogMessage(data_reader, logMsg);
@@ -161,10 +155,6 @@ int LaunchDataReader(void)
 			LogMessage(data_reader, logMsg);
 
 			lstMaster->numberOfDCs -= 1;
-			if (lstMaster->numberOfDCs == 0)
-			{
-				break;
-			}
 		}
 		else
 		{
@@ -174,6 +164,14 @@ int LaunchDataReader(void)
 			lstMaster->dc[dcMachineIndex].lastTimeHeardFrom = msg.data.timeStamp;
 		}
 
+		// checking if any DC machine is not responding
+		Check_DC_Machines_Status(lstMaster);
+
+		// checking if all DC machines goes offline than exit the main loop
+		if (lstMaster->numberOfDCs == 0)
+		{
+			break;
+		}
 		sleep(1.5);
 	}
 
@@ -208,10 +206,9 @@ int GetMachineIndex(MasterList *lstMaster, pid_t dcProcessID)
 	return -1;
 }
 
-int Check_DC_Machines_Status(MasterList *lstMaster)
+void Check_DC_Machines_Status(MasterList *lstMaster)
 {
 	char logMsg[200];
-	int returnMessage = 0;
 
 	for (size_t i = 0; i < lstMaster->numberOfDCs; i++)
 	{
@@ -227,13 +224,6 @@ int Check_DC_Machines_Status(MasterList *lstMaster)
 		{
 			sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", (int)i, (int)lstMaster->dc[i].dcProcessID);
 			// LogMessage(data_reader, logMsg);
-			returnMessage -= 1;
-		}
-		else
-		{
-			returnMessage += 1;
 		}
 	}
-
-	return returnMessage;
 }
