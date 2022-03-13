@@ -115,16 +115,24 @@ int LaunchDataReader(void)
 	// ----------------------------------------------------------------------------------
 
 	// waiting for 15 seconds to let Data Creators create messages
-	sleep(15);
+	sleep(5);
 
 	while (!exitDataReader)
 	{
-		LogMessage(data_reader, "Here------------\n\n");
-		CheckIsMachineAnyMachineInactive(lstMaster);
+		sprintf(logMsg, "Here------------NoOfDCs: %d\n\n", lstMaster->numberOfDCs);
+		LogMessage(data_reader, logMsg);
+
+		// checking if all DC machines goes offline than exit the main loop
+		// if (Check_DC_Machines_Status(lstMaster) == 0)
+		// {
+		// 	break;
+		// }
 
 		rc = msgrcv(mid, (void *)&msg, sizeof(MSGCONTENT), 0, 0); // set type = 0 to get mesgs in FIFO
 		if (rc == -1)
+		{
 			break;
+		}
 
 		sprintf(logMsg, "Message Received with status code: %d - %s\n", (int)msg.type, GetMessageString(msg.type));
 		LogMessage(data_reader, logMsg);
@@ -138,14 +146,25 @@ int LaunchDataReader(void)
 
 			lstMaster->dc[lstMaster->numberOfDCs].dcProcessID = msg.data.dcProcessID;
 			lstMaster->dc[lstMaster->numberOfDCs].lastTimeHeardFrom = msg.data.timeStamp;
-			lstMaster->numberOfDCs += 1;
+			if (lstMaster->numberOfDCs == -1)
+			{
+				lstMaster->numberOfDCs = 1;
+			}
+			else
+			{
+				lstMaster->numberOfDCs += 1;
+			}
 		}
 		else if (msg.type == MACHINE_OFFLINE)
 		{
 			sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", dcMachineIndex, (int)msg.data.dcProcessID);
 			LogMessage(data_reader, logMsg);
 
-			lstMaster->dc[dcMachineIndex].lastTimeHeardFrom = msg.data.timeStamp;
+			lstMaster->numberOfDCs -= 1;
+			if (lstMaster->numberOfDCs == 0)
+			{
+				break;
+			}
 		}
 		else
 		{
@@ -189,9 +208,11 @@ int GetMachineIndex(MasterList *lstMaster, pid_t dcProcessID)
 	return -1;
 }
 
-int CheckIsMachineAnyMachineInactive(MasterList *lstMaster)
+int Check_DC_Machines_Status(MasterList *lstMaster)
 {
 	char logMsg[200];
+	int returnMessage = 0;
+
 	for (size_t i = 0; i < lstMaster->numberOfDCs; i++)
 	{
 		time_t now;
@@ -200,13 +221,19 @@ int CheckIsMachineAnyMachineInactive(MasterList *lstMaster)
 		double diffInSeconds = difftime(now, lstMaster->dc[i].lastTimeHeardFrom);
 
 		sprintf(logMsg, "diffInSeconds is:%0.3f \n", diffInSeconds);
-		LogMessage(data_reader, logMsg);
+		// LogMessage(data_reader, logMsg);
 
 		if (diffInSeconds > MAX_DC_RESPONSE_INTERVAL)
 		{
 			sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", (int)i, (int)lstMaster->dc[i].dcProcessID);
-			LogMessage(data_reader, logMsg);
+			// LogMessage(data_reader, logMsg);
+			returnMessage -= 1;
+		}
+		else
+		{
+			returnMessage += 1;
 		}
 	}
-	return -1;
+
+	return returnMessage;
 }
