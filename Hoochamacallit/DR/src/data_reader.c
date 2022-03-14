@@ -19,7 +19,7 @@ int LaunchDataReader(void)
 	char logMsg[200] = "";
 
 	key_t message_key;
-	
+
 	int mid; // message ID
 	int exitDataReader = FALSE;
 
@@ -102,8 +102,8 @@ int LaunchDataReader(void)
 		return 3;
 	}
 
-	// setting message queue id
-	lstMaster->msgQueueID = mid;
+	// setting message queue id in the shared memory master list
+	lstMaster->msgQueueID = message_key;
 
 	// setting number of DC to 0 on start
 	lstMaster->numberOfDCs = 0;
@@ -164,7 +164,7 @@ void ProcessMessage(MSGENVELOPE *msg, MasterList *lstMaster)
 
 	if (msg->type == EVERYTHING_OKAY && dcMachineIndex == -1)
 	{
-		sprintf(logMsg, "DC-%d [%d] added to the master list - NEW DC - Status %d (%s)\n", lstMaster->numberOfDCs, (int)msg->data.dcProcessID, (int)msg->type, GetMessageString(msg->type));
+		sprintf(logMsg, "DC-%d [%d] added to the master list - NEW DC - Status %d (%s)\n", lstMaster->numberOfDCs + 1, (int)msg->data.dcProcessID, (int)msg->type, GetMessageString(msg->type));
 		LogMessage(data_reader, logMsg);
 
 		lstMaster->dc[lstMaster->numberOfDCs].dcProcessID = msg->data.dcProcessID;
@@ -180,14 +180,14 @@ void ProcessMessage(MSGENVELOPE *msg, MasterList *lstMaster)
 	}
 	else if (msg->type == MACHINE_OFFLINE)
 	{
-		sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", dcMachineIndex, (int)msg->data.dcProcessID);
+		sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", dcMachineIndex + 1, (int)msg->data.dcProcessID);
 		LogMessage(data_reader, logMsg);
 
 		lstMaster->numberOfDCs -= 1;
 	}
 	else
 	{
-		sprintf(logMsg, "DC-%d [%d] updated in the master list - MSG RECEIVED - Status %d (%s)\n", dcMachineIndex, (int)msg->data.dcProcessID, (int)msg->type, GetMessageString(msg->type));
+		sprintf(logMsg, "DC-%d [%d] updated in the master list - MSG RECEIVED - Status %d (%s)\n", dcMachineIndex + 1, (int)msg->data.dcProcessID, (int)msg->type, GetMessageString(msg->type));
 		LogMessage(data_reader, logMsg);
 
 		lstMaster->dc[dcMachineIndex].lastTimeHeardFrom = msg->data.timeStamp;
@@ -226,7 +226,7 @@ void Check_DC_Machines_Status(MasterList *lstMaster)
 		if (diffInSeconds > MAX_DC_RESPONSE_INTERVAL)
 		{
 			sprintf(logMsg, "DC-%d [%d] has gone OFFLINE - removing from master-list\n", (int)i, (int)lstMaster->dc[i].dcProcessID);
-			// LogMessage(data_reader, logMsg);
+			LogMessage(data_reader, logMsg);
 		}
 	}
 }

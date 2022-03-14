@@ -19,7 +19,7 @@ int main(void)
 
 // srand help retrieved from:
 // https://www.geeksforgeeks.org/rand-and-srand-in-ccpp/
-// srand(time(0));
+// srand(time(NULL));
 
 int LaunchDataCreator(void)
 {
@@ -91,7 +91,7 @@ int LaunchDataCreator(void)
             LogMessage(data_creator, logMsg);
 
             isFirstTime = FALSE;
-            srand(time(0)); // set new seed for rand()
+            srand(time(NULL)); // set new seed for rand()
             int interval = (rand() % 21) + 10;
             sleep(interval);
         }
@@ -101,7 +101,7 @@ int LaunchDataCreator(void)
 
         // loop until shutdown status is sent to the data reader
         // as we are sending mesg in msg type, so type 0 causes error
-        srand(time(0)); // set new seed for rand()
+        srand(time(NULL)); // set new seed for rand()
         msg.type = (rand() % NUMBER_OF_STATUSES) + 1;
         msg.data.timeStamp = now;
         msg.data.dcProcessID = myPID;
@@ -138,7 +138,7 @@ int LaunchDataCreator(void)
         {
             // The %21, gives you a number between 0 and 20. Adding 10, gives you a number between 10 and 30.
             // Reference: https://stackoverflow.com/questions/17909215/c-random-numbers-between-10-and-30
-            srand(time(0)); // set new seed for rand()
+            srand(time(NULL)); // set new seed for rand()
             int interval = (rand() % 21) + 10;
             sleep(interval);
         }

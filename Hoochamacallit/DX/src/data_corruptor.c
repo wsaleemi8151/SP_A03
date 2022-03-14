@@ -11,6 +11,7 @@ int LaunchDataCorruptor(void)
     char logMsg[200] = "";
 
     key_t mid;
+    key_t message_key;
     int retryCounterOnStart = 0;
     int exitDataCorruptor = FALSE;
     int rc; // return code from message processing
@@ -67,19 +68,21 @@ int LaunchDataCorruptor(void)
     }
 
     // setting message queue id
-    mid = lstMaster->msgQueueID;
+    message_key = lstMaster->msgQueueID;
 
     while (!exitDataCorruptor)
     {
+        // generate random number between 10 and 30
         srand(time(0)); // set new seed for rand()
         int interval = (rand() % 21) + 10;
         sleep(interval);
 
         // checking if message queue exists
-        if ((mid = msgget(mid, 0)) == -1)
+        if ((mid = msgget(message_key, 0)) == -1)
         {
             exitDataCorruptor = TRUE;
-            LogMessage(data_corruptor, "DX detected that msgQ is gone - assuming DR/DCs done");
+            sprintf(logMsg, "DX detected that msgQ is gone - assuming DR/DCs done: Message Queue ID was %d\n", mid);
+            LogMessage(data_corruptor, logMsg);
             break;
         }
 
