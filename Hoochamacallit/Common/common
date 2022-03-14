@@ -1,0 +1,36 @@
+#
+# this makefile will compile and link the "Common" application
+# 
+# =======================================================
+#                  Common
+# =======================================================
+# FINAL BINARY Target
+./bin/common : ./obj/common.o ./obj/logger.o ./obj/message_queues.o ./obj/shared_memory.o
+	cc ./obj/common.o ./obj/logger.o ./obj/message_queues.o ./obj/shared_memory.o -o ./bin/common
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                      
+./obj/common.o : ./src/common.c ./inc/common.h
+	cc -c ./src/common.c -o ./obj/common.o
+
+./obj/logger.o : ./src/logger.c ./inc/logger.h 
+	cc -c ./src/logger.c -o ./obj/logger.o
+
+./obj/message_queues.o : ./src/message_queues.c ./inc/message_queues.h 
+	cc -c ./src/message_queues.c -o ./obj/message_queues.o
+
+./obj/shared_memory.o : ./src/shared_memory.c ./inc/shared_memory.h 
+	cc -c ./src/shared_memory.c -o ./obj/shared_memory.o
+
+#
+# =======================================================
+# Other targets
+# ======================================================= 
+all: ./bin/common
+
+clean: 
+	rm -f ./bin/common*
+	rm -f ./obj/logger.*
+	rm -f ./obj/message_queues.*
+	rm -f ./obj/shared_memory.*

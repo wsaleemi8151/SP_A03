@@ -1,0 +1,12 @@
+
+all: 
+	sudo make -f ./Common/common 
+	sudo make -f ./DR/dataReader 
+	sudo make -f ./DC/dataCreator 
+	sudo make -f ./DX/dataCorruptor 
+
+clean: 
+	sudo make -f ./Common/common clean
+	sudo make -f ./DR/dataReader clean
+	sudo make -f ./DC/dataCreator clean
+	sudo make -f ./DX/dataCorruptor clean

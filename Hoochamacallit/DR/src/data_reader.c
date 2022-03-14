@@ -19,12 +19,11 @@ int LaunchDataReader(void)
 	char logMsg[200] = "";
 
 	key_t message_key;
-	pid_t myPID;
+	
 	int mid; // message ID
 	int exitDataReader = FALSE;
 
 	int rc; // return code from message processing
-	char buffer[100];
 	MSGENVELOPE msg;
 
 	MasterList *lstMaster;
@@ -32,21 +31,18 @@ int LaunchDataReader(void)
 	int shmid;
 	key_t shmem_key;
 
-	/* data reader PID will be used in message queues */
-	myPID = getpid();
-
 	// ---------------------------- Message Queue -----------------------------------
 	// used /temp folder to get the same message key for data reader and data creator
 	message_key = ftok("/tmp", MESSAGE_QUEUE_KEY_ID);
 	if (message_key == -1)
 	{
-		LogMessage(data_reader, "Cannot allocate key\n");
+		LogMessage(data_reader, "DR - Cannot allocate key\n");
 		return 1;
 	} /* endif */
 
 	if ((mid = msgget(message_key, 0)) == -1)
 	{
-		LogMessage(data_reader, "No queue available, create!\n");
+		LogMessage(data_reader, "DR - No queue available, create!\n");
 
 		/*
 		 * create one message queue (user/group read/write perms)
@@ -55,12 +51,12 @@ int LaunchDataReader(void)
 		mid = msgget(message_key, IPC_CREAT | 0660);
 		if (mid == -1)
 		{
-			LogMessage(data_reader, "Cannot allocate a new queue!\n");
+			LogMessage(data_reader, "DR - Cannot allocate a new queue!\n");
 			return 2;
 		}
 	}
 
-	sprintf(logMsg, "Message queue ID is %d\n", mid);
+	sprintf(logMsg, "DR - Message queue ID is %d\n", mid);
 	LogMessage(data_reader, logMsg);
 
 	// -------------------------------------------------------------------------
@@ -70,7 +66,7 @@ int LaunchDataReader(void)
 	shmem_key = ftok(".", SHARED_MEMORY_KEY_ID);
 	if (shmem_key == -1)
 	{
-		LogMessage(data_reader, "Cannot allocate key\n");
+		LogMessage(data_reader, "DR - Cannot allocate key\n");
 		return 1;
 	}
 
@@ -84,16 +80,16 @@ int LaunchDataReader(void)
 		 * nope, let's create one (user/group read/write perms)
 		 */
 
-		LogMessage(data_reader, "No Shared-Memory currently available - so create!\n");
+		LogMessage(data_reader, "DR - No Shared-Memory currently available - so create!\n");
 		shmid = shmget(shmem_key, sizeof(MasterList), IPC_CREAT | 0660);
 		if (shmid == -1)
 		{
-			LogMessage(data_reader, "Cannot allocate a new memory!\n");
+			LogMessage(data_reader, "DR - Cannot allocate a new memory!\n");
 			return 2;
 		}
 	}
 
-	sprintf(logMsg, "Our Shared-Memory ID is %d\n", shmid);
+	sprintf(logMsg, "DR- Shared-Memory ID is %d\n", shmid);
 	LogMessage(data_reader, logMsg);
 
 	/* now allow the Data Reader (server) to attach to our shared memory and begin
@@ -102,7 +98,7 @@ int LaunchDataReader(void)
 	lstMaster = (MasterList *)shmat(shmid, NULL, 0);
 	if (lstMaster == NULL)
 	{
-		LogMessage(data_reader, "Cannot attach to shared memory!\n");
+		LogMessage(data_reader, "DR - Cannot attach to shared memory!\n");
 		return 3;
 	}
 
@@ -114,12 +110,12 @@ int LaunchDataReader(void)
 	// ----------------------------------------------------------------------------------
 
 	// waiting for 15 seconds to let Data Creators create messages
-	sleep(5);
+	sleep(15);
 
 	while (!exitDataReader)
 	{
-		sprintf(logMsg, "Here------------NoOfDCs: %d\n\n", lstMaster->numberOfDCs);
-		LogMessage(data_reader, logMsg);
+		// sprintf(logMsg, "Here------------NoOfDCs: %d\n\n", lstMaster->numberOfDCs);
+		// LogMessage(data_reader, logMsg);
 
 		rc = msgrcv(mid, (void *)&msg, sizeof(MSGCONTENT), 0, 0); // set type = 0 to get mesgs in FIFO
 		if (rc == -1)
@@ -141,17 +137,17 @@ int LaunchDataReader(void)
 		sleep(1.5);
 	}
 
-	LogMessage(data_reader, "Exiting ... removing msgQ and leaving ...\n");
+	LogMessage(data_reader, "DR - Exiting ... removing msgQ and leaving ...\n");
 	msgctl(mid, IPC_RMID, (struct msqid_ds *)NULL);
 
 	/*
 	 * detach and clean up our resources
 	 */
 
-	LogMessage(data_reader, "Detaching from Shared-Memory\n");
+	LogMessage(data_reader, "DR - Detaching from Shared-Memory\n");
 	shmdt(lstMaster);
 
-	LogMessage(data_reader, "Removing the Shared-Memory resource\n");
+	LogMessage(data_reader, "DR - Removing the Shared-Memory resource\n");
 	shmctl(shmid, IPC_RMID, 0);
 
 	return 1;
@@ -161,7 +157,7 @@ void ProcessMessage(MSGENVELOPE *msg, MasterList *lstMaster)
 {
 	char logMsg[200];
 
-	sprintf(logMsg, "Message Received with status code: %d - %s\n", (int)msg->type, GetMessageString(msg->type));
+	sprintf(logMsg, "DR - Message Received with status code: %d - %s\n", (int)msg->type, GetMessageString(msg->type));
 	LogMessage(data_reader, logMsg);
 
 	int dcMachineIndex = GetMachineIndex(lstMaster, msg->data.dcProcessID);

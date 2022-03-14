@@ -1,0 +1,37 @@
+#
+# this makefile will compile and link the "Data Corruptor" application
+# 
+# =======================================================
+#                  Data Corruptor
+# =======================================================
+# FINAL BINARY Target
+../DR/bin/dataCorruptor : ../DR/obj/data_corruptor.o ../Common/obj/logger.o ../Common/obj/message_queues.o ../Common/obj/shared_memory.o
+	cc ../DR/obj/data_corruptor.o ../Common/obj/logger.o ../Common/obj/message_queues.o ../Common/obj/shared_memory.o -o ../DR/bin/dataCorruptor
+#
+# =======================================================
+#                     Dependencies
+# =======================================================                     
+../DR/obj/data_corruptor.o : ./src/data_corruptor.c ./inc/data_corruptor.h ../Common/inc/common.h
+	cc -c ./src/data_corruptor.c -o ../DR/obj/data_corruptor.o
+	                
+../Common/obj/logger.o : ../Common/src/logger.c ../Common/inc/logger.h 
+	cc -c ../Common/src/logger.c -o ../Common/obj/logger.o
+
+../Common/obj/message_queues.o : ../Common/src/message_queues.c ../Common/inc/message_queues.h 
+	cc -c ../Common/src/message_queues.c -o ../Common/obj/message_queues.o
+
+../Common/obj/shared_memory.o : ../Common/src/shared_memory.c ../Common/inc/shared_memory.h 
+	cc -c ../Common/src/shared_memory.c -o ../Common/obj/shared_memory.o
+
+#
+# =======================================================
+# Other targets
+# ======================================================= 
+all: ./bin/dataCorruptor
+
+clean: 
+	rm -f ./bin/dataCorruptor*
+	rm -f ./obj/data_corruptor.*
+	rm -f ../Common/obj/logger.*
+	rm -f ../Common/obj/message_queues.*
+	rm -f ../Common/obj/shared_memory.*

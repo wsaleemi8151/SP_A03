@@ -7,6 +7,8 @@
         "time.h": "c",
         "message_queues.h": "c",
         "shared_memory.h": "c",
-        "shm.h": "c"
+        "shm.h": "c",
+        "data_corruptor.h": "c",
+        "common.h": "c"
     }
 }
