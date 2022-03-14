@@ -24,6 +24,15 @@ int main(void)
 	return LaunchDataReader();
 }
 
+/*
+ * FUNCTION : LaunchDataReader
+ *
+ * DESCRIPTION : This is the main function which handles all logic for DR application
+ *
+ * PARAMETERS : void
+ *
+ * Returns : int    -   this return value is used in the main method to return the exit status
+ */
 int LaunchDataReader(void)
 {
 	char logMsg[200] = "";
@@ -163,6 +172,16 @@ int LaunchDataReader(void)
 	return 1;
 }
 
+/*
+ * FUNCTION : ProcessMessage
+ *
+ * DESCRIPTION : This function is used to process a message read from Message Queue
+ *
+ * PARAMETERS : MSGENVELOPE *msg 		-	Enum contains message details
+ * 				MasterList *lstMaster	-	Pointer to Master list stored in Shared Memory
+ *
+ * Returns : void
+ */
 void ProcessMessage(MSGENVELOPE *msg, MasterList *lstMaster)
 {
 	char logMsg[200];
@@ -204,6 +223,16 @@ void ProcessMessage(MSGENVELOPE *msg, MasterList *lstMaster)
 	}
 }
 
+/*
+ * FUNCTION : GetMachineIndex
+ *
+ * DESCRIPTION : This function is used to the index of the machine based on provided process id of that machine
+ *
+ * PARAMETERS : MasterList *lstMaster	-	Pointer to Master list stored in Shared Memory
+ * 				pid_t dcProcessID		-	Process ID 
+ *
+ * Returns : int 	-	Index of that DC record in the Master List array
+ */
 int GetMachineIndex(MasterList *lstMaster, pid_t dcProcessID)
 {
 	if (lstMaster->numberOfDCs > 0)
@@ -219,6 +248,16 @@ int GetMachineIndex(MasterList *lstMaster, pid_t dcProcessID)
 	return -1;
 }
 
+/*
+ * FUNCTION : Check_DC_Machines_Status
+ *
+ * DESCRIPTION : This function is used to check the all DC machine status and 
+ * 					see if any of the machine is not responding, then remove that machine from the main dc list
+ *
+ * PARAMETERS : MasterList *lstMaster	-	Pointer to Master list stored in Shared Memory
+ *
+ * Returns : void
+ */
 void Check_DC_Machines_Status(MasterList *lstMaster)
 {
 	char logMsg[200];

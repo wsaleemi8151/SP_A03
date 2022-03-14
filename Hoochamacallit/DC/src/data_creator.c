@@ -31,6 +31,15 @@ int main(void)
 // https://www.geeksforgeeks.org/rand-and-srand-in-ccpp/
 // srand(time(NULL));
 
+/*
+ * FUNCTION : LaunchDataCreator
+ *
+ * DESCRIPTION : This is the main function which handles all logic for DC application
+ *
+ * PARAMETERS : void
+ *
+ * Returns : int    -   this return value is used in the main method to return the exit status
+ */
 int LaunchDataCreator(void)
 {
     char logMsg[200] = "";

@@ -16,6 +16,15 @@ int main(void)
     return LaunchDataCorruptor();
 }
 
+/*
+ * FUNCTION : LaunchDataCorruptor
+ *
+ * DESCRIPTION : This is the main function which handles all logic for DX application
+ *
+ * PARAMETERS : void
+ *
+ * Returns : int    -   this return value is used in the main method to return the exit status
+ */
 int LaunchDataCorruptor(void)
 {
     char logMsg[200] = "";
@@ -102,6 +111,16 @@ int LaunchDataCorruptor(void)
     return 1;
 }
 
+/*
+ * FUNCTION : SpinTheWheelOfDistruction
+ *
+ * DESCRIPTION : This function is used to do the random spin wheel and do the process selected in each iteration
+ *
+ * PARAMETERS : MasterList *lstMaster	-	Pointer to Master list stored in Shared Memory
+ *              key_t mid 		        -	Message Queue ID
+ *
+ * Returns : void
+ */
 void SpinTheWheelOfDistruction(MasterList *lstMaster, key_t mid)
 {
     // The %21, gives you a number between 0 and 20. Adding 10, gives you a number between 10 and 30.
@@ -181,6 +200,17 @@ void SpinTheWheelOfDistruction(MasterList *lstMaster, key_t mid)
     }
 }
 
+/*
+ * FUNCTION : KillProcess
+ *
+ * DESCRIPTION : This function is used to Kill the process of DC using ProcessID
+ *
+ * PARAMETERS : MasterList *lstMaster	-	Pointer to Master list stored in Shared Memory
+ *              int indexOfDC           -   Index of DC in the list of DC in the Master List
+ *              int wheelCounter        -   Spin Wheel possible options array item counter
+ *
+ * Returns : void
+ */
 void KillProcess(MasterList *lstMaster, int indexOfDC, int wheelCounter)
 {
     char logMsg[200];

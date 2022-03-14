@@ -10,6 +10,15 @@
 
 #include "../inc/message_queues.h"
 
+/*
+ * FUNCTION : GetMessageString
+ *
+ * DESCRIPTION : This function is used to get the actual text associated with any status
+ *
+ * PARAMETERS : long status      -   status code
+ *
+ * Returns : char pointer for the text status
+ */
 char *GetMessageString(long status)
 {
     switch (status)

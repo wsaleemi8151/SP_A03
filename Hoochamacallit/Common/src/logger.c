@@ -12,7 +12,18 @@
 #include "../inc/logger.h"
 #include <time.h>
 
-void LogMessage(enum AppTypesEnum loggerType, char *message)
+/*
+ * FUNCTION : LogMessage
+ *
+ * DESCRIPTION : This function is used to parse loggin message based on App Type
+ *                  then pass this message to another function to write it to log file
+ *
+ * PARAMETERS : enum AppTypesEnum appType   -   App type on which function decide which file path to be used to write the log
+ *              char *message               -   Actual Log message sent by the application
+ *
+ * Returns : void
+ */
+void LogMessage(enum AppTypesEnum appType, char *message)
 {
     char logMsg[250];
     int writingLogResult = 0;
@@ -38,7 +49,7 @@ void LogMessage(enum AppTypesEnum loggerType, char *message)
     // adding timestamp to the message
     sprintf(logMsg, "%s : %s", buf, message);
 
-    switch (loggerType)
+    switch (appType)
     {
     case data_creator:
         sprintf(logFileName, "/tmp/dataCreator.log");
@@ -59,6 +70,16 @@ void LogMessage(enum AppTypesEnum loggerType, char *message)
     }
 }
 
+/*
+ * FUNCTION : WriteLogToFile
+ *
+ * DESCRIPTION : This function is used to write log entry to the file provided path
+ *
+ * PARAMETERS : char *fileName      -   File name with complete path in which logs will be written
+ *              char *message       -   updated message having timestamp
+ *
+ * Returns : return 1 if success, else return -1 if error occurred
+ */
 int WriteLogToFile(char *fileName, char *message)
 {
     printf("%s", message);
@@ -87,4 +108,6 @@ int WriteLogToFile(char *fileName, char *message)
         printf("Error closing file4.note file\n");
         return -1; // returns -1 if writing log failed
     }
+
+    return 1;
 }
