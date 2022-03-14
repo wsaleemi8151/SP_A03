@@ -1,3 +1,12 @@
+/*
+ * FILE : data_corruptor.h
+ * PROJECT : SENG2030-22W-Sec1-System Programming - assignment # 3
+ * Group: A03-17
+ * PROGRAMMER : Gursharan Singh - Waqar Ali Saleemi
+ * FIRST VERSION : 2022-03-08
+ * DESCRIPTION :
+ * Header file for data corruptor application
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,8 +18,7 @@
 #include <time.h>
 
 #include <unistd.h>
-#include<signal.h>
-
+#include <signal.h>
 
 #include "../../Common/inc/message_queues.h"
 #include "../../Common/inc/logger.h"

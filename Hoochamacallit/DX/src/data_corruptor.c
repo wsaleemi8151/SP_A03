@@ -1,3 +1,13 @@
+/*
+ * FILE : data_corruptor.c
+ * PROJECT : SENG2030-22W-Sec1-System Programming - assignment # 3
+ * Group: A03-17
+ * PROGRAMMER : Gursharan Singh - Waqar Ali Saleemi
+ * FIRST VERSION : 2022-03-08
+ * DESCRIPTION :
+ * Source code file for data corruptor application
+ * Function in this file are used to handle the functionality for DX application
+ */
 
 #include "../inc/data_corruptor.h"
 

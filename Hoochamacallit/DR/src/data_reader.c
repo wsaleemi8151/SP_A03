@@ -1,3 +1,13 @@
+/*
+ * FILE : data_reader.c
+ * PROJECT : SENG2030-22W-Sec1-System Programming - assignment # 3
+ * Group: A03-17
+ * PROGRAMMER : Gursharan Singh - Waqar Ali Saleemi
+ * FIRST VERSION : 2022-03-08
+ * DESCRIPTION :
+ * Source code file for data reader application
+ * Function in this file are used to handle the functionality for DR application
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
